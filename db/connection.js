@@ -11,6 +11,13 @@ if (process.env.JAWSDB_URL){
         port: 3306,
         user: "root",
         password: "Nijm8418",
-        database: "burger_db"
+        database: "worktrack_db"
     });
 };
+
+connection.connect();
+
+//Callbacks Don't "await", they promise
+connection.query = util.promisify(connection.query);
+
+module.exports = connection;
