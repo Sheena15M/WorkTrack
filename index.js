@@ -113,3 +113,37 @@ require("console.table");
           return quit();
       }
     }
+
+    async function viewEmployees() {
+        const employees = await db.findAllEmployees();
+      
+        console.log("\n");
+        console.table(employees);
+      
+        loadMainPrompts();
+      }
+
+      async function viewEmployeesByDepartment() {
+        const departments = await db.findAllDepartments();
+      
+        const departmentChoices = departments.map(({ id, name }) => ({
+          name: name,
+          value: id
+        }));
+
+        const { departmentId } = await prompt([
+            {
+              type: "list",
+              name: "departmentId",
+              message: "Which department would you like to see employees for?",
+              choices: departmentChoices
+            }
+          ]);
+        
+          const employees = await db.findAllEmployeesByDepartment(departmentId);
+        
+          console.log("\n");
+          console.table(employees);
+        
+          loadMainPrompts();
+        }
