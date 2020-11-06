@@ -11,7 +11,7 @@ if (process.env.JAWSDB_URL){
         port: 3306,
         user: "root",
         password: "Nijm8418",
-        database: "worktrack_db"
+        database: "employees"
     });
 };
 

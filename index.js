@@ -1,9 +1,18 @@
 const logo = require("asciiart-logo");
 const { prompt } = require("inquirer");
-const db = require("./db");
+
+const connection = require("./db/connection")
 require("console.table");
   
   init();
+
+  function viewEmployees() {
+  connection.query("select * from employee").then(res => {
+    console.table(res)
+    loadMainPrompts();
+  })
+}
+
   
   // Show the logo and load the required prompts
   function init() {
@@ -114,14 +123,14 @@ require("console.table");
       }
     }
 
-    async function viewEmployees() {
-        const employees = await db.findAllEmployees();
+    // async function viewEmployees() {
+    //     const employees = await db.findAllEmployees();
       
-        console.log("\n");
-        console.table(employees);
+    //     console.log("\n");
+    //     console.table(employees);
       
-        loadMainPrompts();
-      }
+    //     loadMainPrompts();
+    //   }
 
       async function viewEmployeesByDepartment() {
         const departments = await db.findAllDepartments();
