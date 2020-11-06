@@ -13,6 +13,33 @@ require("console.table");
   })
 }
 
+function viewDepartments() {
+  connection.query("select * from employee").then(res => {
+    console.table(res)
+    loadMainPrompts();
+  })
+}
+
+function viewEmployeesByDepartment() {
+  connection.query("select * from employee").then(res => {
+    console.table(res)
+    loadMainPrompts();
+  })
+}
+
+function viewEmployeesByManager() {
+  connection.query("select * from employee").then(res => {
+    console.table(res)
+    loadMainPrompts();
+  })
+}
+
+function viewRoles() {
+  connection.query("select * from employee").then(res => {
+    console.table(res)
+    loadMainPrompts();
+  })
+}
   
   // Show the logo and load the required prompts
   function init() {
