@@ -13,6 +13,40 @@ require("console.table");
   })
 }
 
+function addEmployee() {
+
+  connection.query("select * from role", function(err, response){
+    console.log(response)
+  })
+     prompt([
+      {
+        name: "first_name",
+        message: "What is the employee's first name?"
+      },
+      {
+        name: "last_name",
+        message: "What is the employee's last name?"
+      },
+      
+        {
+          type: "list",
+          name: "departmentId",
+          message: "Which Role Does the User have ?",
+          choices: ["Development Lead", "Developer", "Lead Test Engineer", "Test Engineer", "HR Manager", "HR Representative", "Operations Lead", "Operations Engineer"] //put in new array here 
+        }
+    ]).then(user => {
+      console.log(user.first_name)
+      console.log(user.last_name)
+      connection.query("insert into employee set ?", {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        role_id: 2
+      })
+      loadMainPrompts()
+    })
+  
+}
+
 function viewDepartments() {
   connection.query("select * from employee").then(res => {
     console.table(res)
@@ -20,16 +54,56 @@ function viewDepartments() {
   })
 }
 
-function viewEmployeesByDepartment() {
-  connection.query("select * from employee").then(res => {
-    console.table(res)
-    loadMainPrompts();
+async function viewEmployeesByDepartment() {
+  connection.query("select * from department").then(res => {
+
+      let departments = res.map(dep => {
+        return {
+          name: dep.name,
+          value: dep.id
+        }
+      })
+
+      prompt([
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Which department would you like to see employees for?",
+        choices: departments
+      }
+    ]).then(inqres => {
+
+      connection.query("select employee.first_name FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = ?;", inqres.departmentId).then(res => {
+        console.log(res)
+        loadMainPrompts();
+      })
+
+   
+    //console.table(res)
+   
+  })
   })
 }
 
 function viewEmployeesByManager() {
   connection.query("select * from employee").then(res => {
-    console.table(res)
+    
+    //map over the res, to return name and the id of all the employees. Display those names as the choices int he next 
+    //inquirere prompt.
+
+    prompt([
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Which Employees do you want to see?",
+        choices: ["leigh", "Tashena"] //put in new array here 
+      }
+    ]).then(employee => {
+
+      //have another connection query, display employees that have the selected manager indicated employee.departmentID
+
+    })
+
     loadMainPrompts();
   })
 }
@@ -159,30 +233,30 @@ function viewRoles() {
     //     loadMainPrompts();
     //   }
 
-      async function viewEmployeesByDepartment() {
-        const departments = await db.findAllDepartments();
+      // async function viewEmployeesByDepartment() {
+      //   const departments = await db.findAllDepartments();
       
-        const departmentChoices = departments.map(({ id, name }) => ({
-          name: name,
-          value: id
-        }));
+      //   const departmentChoices = departments.map(({ id, name }) => ({
+      //     name: name,
+      //     value: id
+      //   }));
 
-        const { departmentId } = await prompt([
-            {
-              type: "list",
-              name: "departmentId",
-              message: "Which department would you like to see employees for?",
-              choices: departmentChoices
-            }
-          ]);
+      //   const { departmentId } = await prompt([
+      //       {
+      //         type: "list",
+      //         name: "departmentId",
+      //         message: "Which department would you like to see employees for?",
+      //         choices: departmentChoices
+      //       }
+      //     ]);
         
-          const employees = await db.findAllEmployeesByDepartment(departmentId);
+      //     const employees = await db.findAllEmployeesByDepartment(departmentId);
         
-          console.log("\n");
-          console.table(employees);
+      //     console.log("\n");
+      //     console.table(employees);
         
-          loadMainPrompts();
-        }
+      //     loadMainPrompts();
+      //   }
 
         async function viewEmployeesByManager() {
             const managers = await db.findAllEmployees();
@@ -432,58 +506,58 @@ function viewRoles() {
     loadMainPrompts();
   }
 
-  async function addEmployee() {
-    const roles = await db.findAllRoles();
-    const employees = await db.findAllEmployees();
+  // async function addEmployee() {
+  //   const roles = await db.findAllRoles();
+  //   const employees = await db.findAllEmployees();
   
-    const employee = await prompt([
-      {
-        name: "first_name",
-        message: "What is the employee's first name?"
-      },
-      {
-        name: "last_name",
-        message: "What is the employee's last name?"
-      }
-    ]);
+  //   const employee = await prompt([
+  //     {
+  //       name: "first_name",
+  //       message: "What is the employee's first name?"
+  //     },
+  //     {
+  //       name: "last_name",
+  //       message: "What is the employee's last name?"
+  //     }
+  //   ]);
   
-    const roleChoices = roles.map(({ id, title }) => ({
-      name: title,
-      value: id
-    }));
+  //   const roleChoices = roles.map(({ id, title }) => ({
+  //     name: title,
+  //     value: id
+  //   }));
   
-    const { roleId } = await prompt({
-      type: "list",
-      name: "roleId",
-      message: "What is the employee's role?",
-      choices: roleChoices
-    });
+  //   const { roleId } = await prompt({
+  //     type: "list",
+  //     name: "roleId",
+  //     message: "What is the employee's role?",
+  //     choices: roleChoices
+  //   });
 
-    employee.role_id = roleId;
+  //   employee.role_id = roleId;
   
-    const managerChoices = employees.map(({ id, first_name, last_name }) => ({
-      name: `${first_name} ${last_name}`,
-      value: id
-    }));
-    managerChoices.unshift({ name: "None", value: null });
+  //   const managerChoices = employees.map(({ id, first_name, last_name }) => ({
+  //     name: `${first_name} ${last_name}`,
+  //     value: id
+  //   }));
+  //   managerChoices.unshift({ name: "None", value: null });
   
-    const { managerId } = await prompt({
-      type: "list",
-      name: "managerId",
-      message: "Who is the employee's manager?",
-      choices: managerChoices
-    });
+  //   const { managerId } = await prompt({
+  //     type: "list",
+  //     name: "managerId",
+  //     message: "Who is the employee's manager?",
+  //     choices: managerChoices
+  //   });
   
-    employee.manager_id = managerId;
+  //   employee.manager_id = managerId;
   
-    await db.createEmployee(employee);
+  //   await db.createEmployee(employee);
   
-    console.log(
-      `Added ${employee.first_name} ${employee.last_name} to the database`
-    );
+  //   console.log(
+  //     `Added ${employee.first_name} ${employee.last_name} to the database`
+  //   );
   
-    loadMainPrompts();
-  }
+  //   loadMainPrompts();
+  // }
   
   function quit() {
     console.log("Goodbye!");
